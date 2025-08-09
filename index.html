@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cosmic Resume Builder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Poppins:wght@300;400;500&display=swap');
+        
+        html {
+            background: transparent;
+            cursor: none;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: #e0e0e0;
+            overflow-x: hidden;
+            min-height: 100vh;
+            cursor: none;
+            background-color: #05060d;
+        }
+
+        a, button, input, textarea, select, [data-interactive] {
+          cursor: none !important;
+        }
+
+        h1, h2, h3, h4, .orbitron { font-family: 'Orbitron', sans-serif; }
+        .glow-text { text-shadow: 0 0 8px rgba(173, 137, 255, 0.6), 0 0 16px rgba(114, 129, 255, 0.4); }
+
+        .bg-space-dark { background: rgba(22, 25, 49, 0.85); backdrop-filter: blur(10px); border: 1px solid rgba(114, 129, 255, 0.2); }
+
+        .form-step.active { animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- Star & Meteor Animations --- */
+        .floating-star { position: absolute; background: white; border-radius: 50%; animation: float-up linear infinite; will-change: transform, opacity; }
+        @keyframes float-up { 0% { transform: translateY(100vh) scale(1); opacity: 0; } 10%, 90% { opacity: 1; } 100% { transform: translateY(-100px) scale(1.5); opacity: 0; } }
+
+        .twinkling-star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            animation: twinkle linear infinite;
+            box-shadow: 0 0 4px #fff, 0 0 8px #fff, 0 0 12px rgba(173, 137, 255, 0.7);
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.2; transform: scale(0.8); }
+        }
+
+        .meteor {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            height: 2px;
+            background: linear-gradient(-45deg, rgba(173, 137, 255, 1), rgba(173, 137, 255, 0));
+            border-radius: 999px;
+            filter: drop-shadow(0 0 6px rgba(173, 137, 255, 0.8));
+            animation: meteor-fall linear infinite;
+            will-change: transform, opacity;
+            opacity: 0;
+        }
+        @keyframes meteor-fall {
+            0% {
+                transform: translateX(-70vw) translateY(-70vh) rotate(-45deg);
+                opacity: 1;
+                width: 0px;
+            }
+            10% { width: 200px; }
+            90% { opacity: 1; }
+            100% {
+                transform: translateX(70vw) translateY(70vh) rotate(-45deg);
+                opacity: 0;
+                width: 200px;
+            }
+        }
+
+        /* Interactive Cursor Styles */
+        .cursor-dot, .cursor-outline {
+            pointer-events: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            border-radius: 50%;
+            opacity: 1;
+            transform: translate(-50%, -50%);
+            transition: opacity 0.3s, transform 0.3s, width 0.3s, height 0.3s, background-color 0.3s;
+            z-index: 9999;
+            will-change: transform, width, height;
+        }
+
+        .cursor-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #8d5ae9;
+        }
+
+        .cursor-outline {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(141, 90, 233, 0.2);
+            border: 2px solid rgba(141, 90, 233, 0.4);
+        }
+        
+        .cursor-dot.hover {
+             transform: translate(-50%, -50%) scale(0.7);
+        }
+
+        .cursor-outline.hover {
+            width: 55px;
+            height: 55px;
+            background-color: rgba(141, 90, 233, 0.3);
+            border-color: rgba(141, 90, 233, 0.6);
+        }
+
+        .cursor-outline.click {
+            transform: translate(-50%, -50%) scale(0.85);
+            width: 50px;
+            height: 50px;
+        }
+
+        @media (max-width: 768px), (pointer: coarse) {
+            .cursor-dot, .cursor-outline {
+                display: none;
+            }
+            html, body, a, button, input, textarea, select {
+                cursor: auto !important;
+            }
+        }
+
+        /* Enhanced Galaxy Background */
+        #background-container {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: -1;
+            background-color: #05060d;
+            overflow: hidden;
+        }
+        .galaxy {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            border-radius: 50%;
+            will-change: transform, opacity;
+            opacity: 0; /* Hide by default */
+            transition: opacity 1.5s ease-in-out; /* Smooth transition */
+        }
+        .galaxy-1 {
+            width: 250%;
+            padding-bottom: 250%;
+            background: radial-gradient(ellipse at center, rgba(121, 83, 204, 0.25) 0%, rgba(62, 44, 117, 0) 55%);
+            animation: spin-galaxy 90s linear infinite;
+        }
+        .galaxy-2 {
+            width: 200%;
+            padding-bottom: 200%;
+            background: radial-gradient(ellipse at center, rgba(83, 134, 204, 0.15) 0%, rgba(44, 63, 117, 0) 50%);
+            animation: spin-galaxy 120s linear infinite reverse;
+        }
+        .galaxy-3 {
+            width: 300%;
+            padding-bottom: 300%;
+            background: radial-gradient(ellipse at center, rgba(150, 83, 204, 0.1) 0%, rgba(62, 44, 117, 0) 60%);
+            animation: spin-galaxy 150s linear infinite;
+        }
+        .galaxy-4 {
+            width: 200%;
+            padding-bottom: 200%;
+            background: radial-gradient(ellipse at center, rgba(204, 83, 150, 0.12) 0%, rgba(117, 44, 62, 0) 55%);
+            animation: spin-galaxy 180s linear infinite alternate;
+        }
+        .galaxy-5 {
+            width: 350%;
+            padding-bottom: 350%;
+            background: radial-gradient(ellipse at center, rgba(64, 224, 208, 0.1) 0%, rgba(44, 117, 110, 0) 60%);
+            animation: spin-galaxy 220s linear infinite reverse;
+        }
+        .galaxy-6 {
+            width: 280%;
+            padding-bottom: 280%;
+            background: radial-gradient(ellipse at center, rgba(255, 215, 0, 0.08) 0%, rgba(117, 98, 44, 0) 55%);
+            animation: spin-galaxy 250s linear infinite;
+        }
+
+        /* Theme-based visibility */
+        .theme-1 .galaxy-1, .theme-1 .galaxy-2 { opacity: 1; }
+        .theme-2 .galaxy-2, .theme-2 .galaxy-3 { opacity: 1; }
+        .theme-3 .galaxy-3, .theme-3 .galaxy-4 { opacity: 1; }
+        .theme-4 .galaxy-4, .theme-4 .galaxy-5 { opacity: 1; }
+        .theme-5 .galaxy-5, .theme-5 .galaxy-6 { opacity: 1; }
+        .theme-6 .galaxy-6, .theme-6 .galaxy-1 { opacity: 1; }
+
+        @keyframes spin-galaxy {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .resume-output h3 { color: #4f46e5; }
+        .skill-bar { height: 8px; background: rgba(0, 0, 0, 0.1); border-radius: 5px; overflow: hidden; }
+        .skill-progress { height: 100%; background: linear-gradient(90deg, #5959e0, #8d5ae9); border-radius: 5px; }
+        .btn-space { background: linear-gradient(45deg, #5959e0, #8d5ae9); border: none; color: white; transition: all 0.3s; }
+        .btn-space:hover { transform: translateY(-2px); box-shadow: 0 0 15px rgba(114, 129, 255, 0.5); }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.1.0/",
+    "react": "https://esm.sh/react@^19.1.0",
+    "@google/genai": "https://esm.sh/@google/genai@^1.11.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
+    "jspdf": "https://esm.sh/jspdf@^2.5.1",
+    "html2canvas": "https://esm.sh/html2canvas@^1.4.1"
+  }
+}
+</script>
+</head>
+<body class="relative">
+    <div id="root"></div>
+</body>
+</html>
